@@ -21,7 +21,11 @@ class Leaders extends State<LeaderBoard> {
       Map<String, Team> sTeams = {};
       for(var obj in response.result) {
         String name = obj.get<String>("teamName");
-        int count = obj.get<List<dynamic>>("codes").length;
+        var codes = obj.get<List<dynamic>>("codes");
+        if(codes == null) {
+          codes = [];
+        }
+        int count = codes.length;
         if(sTeams[name] == null) {
           sTeams[name] = Team(name, 1, 0);
         }
@@ -30,11 +34,11 @@ class Leaders extends State<LeaderBoard> {
       List<Team> sorted = sTeams.values.toList();
       sorted.sort((a, b) => b.count - a.count);
       int curCount = 1000000;
-      int curRank = 1;
+      int curRank = 0;
       for(Team t in sorted) {
         if(t.count < curCount) {
           curCount = t.count;
-          t.rank = curRank++;
+          t.rank = ++curRank;
         }
         else {
           t.rank = curRank;

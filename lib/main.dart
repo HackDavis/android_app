@@ -7,13 +7,22 @@ import 'package:parse_server_sdk/parse.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
-  MyAppState createState() => MyAppState();
+  Widget build(BuildContext context) {
+    return CupertinoApp(
+        title: "HackDavis",
+        home: MainWidget(),
+        initialRoute: "/login",
+        routes: {
+          '/login': (context) => Login()
+        }
+        );
+  }
 }
 
-class MyAppState extends State<MyApp> {
+class MainWidgetState extends State<MainWidget> {
   dynamic currentUser = "waiting";
   @override
   void initState() {
@@ -30,39 +39,29 @@ class MyAppState extends State<MyApp> {
   }
   @override
   Widget build(BuildContext context) {
-    return CupertinoApp(
-        title: "HackDavis",
-        home: MainWidget(currentUser),
-        initialRoute: "/login",
-        routes: {
-          '/login': (context) => Login()
-        });
+    if(currentUser == null) {
+      Navigator.of(context).pushNamed("/login").then((user) => setState(() => currentUser = user));
+    }
+    return CupertinoTabScaffold(
+      tabBar: CupertinoTabBar(
+        items: <BottomNavigationBarItem> [
+          BottomNavigationBarItem(icon: Icon(CupertinoIcons.clock)),
+          BottomNavigationBarItem(icon: Icon(CupertinoIcons.check_mark)),
+          BottomNavigationBarItem(icon: Icon(CupertinoIcons.flag)),
+        ],
+      ),
+      tabBuilder: (BuildContext context, int index) {
+        switch(index) {
+          case 0: return CountDown();
+          case 1: return BadgeWidget();
+          case 2: return LeaderBoard();
+        }
+      },
+    );
   }
 }
 
-class MainWidget extends StatelessWidget {
-  final dynamic user;
-  MainWidget(this.user);
+class MainWidget extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    if(this.user == null) {
-      Navigator.of(context).pushNamed("/login");
-    }
-    return CupertinoTabScaffold(
-          tabBar: CupertinoTabBar(
-            items: <BottomNavigationBarItem> [
-              BottomNavigationBarItem(icon: Icon(CupertinoIcons.clock)),
-              BottomNavigationBarItem(icon: Icon(CupertinoIcons.check_mark)),
-              BottomNavigationBarItem(icon: Icon(CupertinoIcons.flag)),
-            ],
-          ),
-          tabBuilder: (BuildContext context, int index) {
-            switch(index) {
-              case 0: return CountDown();
-              case 1: return Badges();
-              case 2: return LeaderBoard();
-            }
-          },
-        );
-  }
+  MainWidgetState createState() => MainWidgetState();
 }

@@ -11,9 +11,11 @@ class Badges extends State<BadgeWidget> {
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
           middle: Text('Badges'),
-          trailing: CupertinoButton(child: Icon(CupertinoIcons.plus_circled),
-              onPressed: () => Navigator.push(context, CupertinoPageRoute(builder:
-                  (context) => AddBadge()))),
+          trailing: LayoutBuilder(builder: (context, constraints) => ConstrainedBox(constraints: constraints,
+          child: CupertinoButton(child: Icon(CupertinoIcons.plus_circled),
+              onPressed: () => Navigator.of(context).push<void>(CupertinoPageRoute(
+                  builder:
+                  (context) => AddBadge()))))),
         ),
         child: Builder(builder: (context) =>
             Container(padding: MediaQuery.of(context).padding, child:
@@ -33,17 +35,21 @@ class AddBadgeForm extends State<AddBadge> {
   var controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    var route = ModalRoute.of(context);
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        leading: CupertinoNavigationBarBackButton(color: CupertinoColors.activeBlue),
+        leading: CupertinoNavigationBarBackButton(color: CupertinoColors.activeBlue,
+        previousPageTitle: "Badges",),
       ),
+      child: Builder(builder: (context) => Padding(padding: MediaQuery.of(context).padding,
       child: Column(children: <Widget>[
         Text("Add a badge code"),
         CupertinoTextField(controller: controller,),
         CupertinoButton(child: Text("Submit"), onPressed: () {
           Navigator.of(context).pop();
         },)
-      ],)
+      ],))
+      )
     );
   }
 

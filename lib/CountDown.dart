@@ -29,17 +29,44 @@ class Schedule extends StatefulWidget {
 
 }
 
+class ScheduleItem {
+  String name;
+  String description;
+  DateTime startTime;
+  DateTime endTime;
+  ScheduleItem(this.name, this.description, this.startTime, this.endTime);
+}
+
 class ScheduleState extends State<Schedule> {
+  List<ScheduleItem> items = [];
   @override
   void initState() {
-
+    ParseObject('Schedule').getAll().then((response) {
+      List<ScheduleItem> mItems = response.result.map<ScheduleItem>((element) => ScheduleItem(
+        element.get<String>("name"), element.get<String>("description"),
+          element.get<DateTime>("startTime"), element.get<DateTime>("endTime")
+      )).toList();
+      setState(() {
+        items = mItems;
+      });
+    }, onError: (error) => print(error));
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-    return ListView(children: <Widget>[
 
-    ],);
+    return ListView(
+        padding: EdgeInsets.only(top: 0),
+        children: items.map((e) => Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children:[
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: [
+          Text(e.name),
+          Text("${e.startTime.hour.toString()}:${e.startTime.minute.toString()}")
+        ]),
+        Text(e.description)
+      ]
+    )).toList());
   }
 
 }
@@ -76,7 +103,12 @@ class TimeTicker extends State<Time> {
     int minutes = delta.inHours % Duration.minutesPerHour;
     int seconds = delta.inSeconds % Duration.secondsPerMinute;
     String computed = "${delta.inHours.toString()}:$minutes:$seconds";
-    return Text(computed, textAlign: TextAlign.center, textScaleFactor: 2,);
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text("Hackathon Ends: "),
+          Text(computed, textScaleFactor: 3,)
+    ]);
   }
 
 }

@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:parse_server_sdk/parse.dart';
 class LeaderBoard extends StatefulWidget {
   @override
@@ -52,17 +52,17 @@ class Leaders extends State<LeaderBoard> {
   }
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(middle: Text("Leaderboard",)),
-        child: Builder(builder: (context) => Container(padding: MediaQuery.of(context).padding,child: ListView(
+    return Scaffold(
+        body: Builder(builder: (context) => Container(padding: MediaQuery.of(context).padding,child: ListView(
           padding: EdgeInsets.all(15.0),
-          children: teams.map((e) => Row(
+          children: teams.map((e) => Padding(padding: EdgeInsets.only(top: 10.0, bottom: 10.0), child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text("#${e.rank} - ${e.name}"),
-              Text("${e.count} Badges")
+              Row(children: [Text("#${e.rank}", style: Theme.of(context).textTheme.body1, textScaleFactor: 1.2,),
+              Text(" - ${e.name}", style: Typography.whiteMountainView.body1, textScaleFactor: 1.2,)],),
+              Text("${e.count} Badges", style: Theme.of(context).textTheme.body1, textScaleFactor: 1.2,)
             ],
-          )).toList(),
+          ))).toList(),
         )
         )
         )

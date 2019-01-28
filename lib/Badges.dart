@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:parse_server_sdk/parse.dart';
 import 'PopOver.dart';
@@ -11,22 +11,18 @@ class BadgeWidget extends StatefulWidget {
 class Badges extends State<BadgeWidget> {
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(
-          middle: Text('Badges'),
-          trailing: LayoutBuilder(builder: (context, constraints) => ConstrainedBox(constraints: constraints,
-          child: CupertinoButton(child: Icon(CupertinoIcons.plus_circled),
-              onPressed: () => Navigator.of(context).push<void>(CupertinoPageRoute(
-                  builder:
-                  (context) => AddBadge()))))),
-        ),
-        child: Builder(builder: (context) =>
+    return Scaffold(
+        body: Builder(builder: (context) =>
             Container(padding: MediaQuery.of(context).padding, child:
             GridView.count(crossAxisCount: 3, children: <Widget>[
 
             ],)
     )
-    )
+    ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: "Add a badge",
+          child: Icon(Icons.add),
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddBadge()))),
     );
   }
 }
@@ -43,15 +39,15 @@ class AddBadgeForm extends State<AddBadge> {
   Widget build(BuildContext context) {
     var columnChildren = <Widget>[];
     columnChildren += [
-      Text("Add a badge code"),
-      CupertinoTextField(controller: controller, onChanged: (s) {
+      Text("Add a badge code", style: Theme.of(context).textTheme.headline),
+      TextField(controller: controller, style: Theme.of(context).textTheme.body1, onChanged: (s) {
         if(invalid) {
           setState(() {
             invalid = false;
           });
         }
       },),
-      CupertinoButton(child: Text("Submit"), onPressed: () {
+      FlatButton(child: Text("Submit", style: Theme.of(context).textTheme.button), onPressed: () {
         var query = QueryBuilder<ParseObject>(ParseObject("Badge"));
         query.whereContains("codes", controller.text);
         query.query().then((response) {
@@ -70,14 +66,11 @@ class AddBadgeForm extends State<AddBadge> {
     if(invalid) {
       columnChildren.insert(2, Align(
         alignment: Alignment.centerLeft,
-          child: PopOver(text: "Badge Number is Wrong", popOverColor: CupertinoColors.destructiveRed, brightness: Brightness.dark,))
+          child: PopOver(text: "Badge Number is Wrong", popOverColor: Colors.red, brightness: Brightness.dark,))
       );
     }
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        automaticallyImplyLeading: true,
-      ),
-      child: Builder(builder: (context) => Padding(padding: MediaQuery.of(context).padding,
+    return Scaffold(
+      body: Builder(builder: (context) => Padding(padding: MediaQuery.of(context).padding,
       child: Column(children: columnChildren,))
       )
     );

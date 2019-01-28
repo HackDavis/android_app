@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:parse_server_sdk/parse.dart';
 import 'package:flutter/services.dart';
 import 'PopOver.dart';
@@ -19,7 +19,7 @@ class LoginForm extends State<Login> {
   @override
   Widget build(BuildContext context) {
     List<Widget> columnChildren = [
-      CupertinoTextField(controller: userName,
+      TextField(controller: userName,
         onChanged: (s) {
           if(teamExists || invalid) {
             setState(() {
@@ -37,7 +37,7 @@ class LoginForm extends State<Login> {
             }
           });
         },),
-      CupertinoButton(child: Text("Login"),
+      FlatButton(child: Text("Login", style: Theme.of(context).textTheme.button),
         onPressed: () {
           if(userName.text.length == 0) {
             setState(() {
@@ -48,7 +48,7 @@ class LoginForm extends State<Login> {
             try {
               platform.invokeMethod("loginAnonymous",
                   <String, dynamic>{"teamName": userName.text}).then((result) {
-                Navigator.of(context).pop(result);
+                              Navigator.of(context).pop(result);
               });
             }
             on PlatformException catch (e) {
@@ -59,20 +59,21 @@ class LoginForm extends State<Login> {
     ];
     if(teamExists) {
       columnChildren.insert(1, Align(alignment: Alignment.centerLeft, child:
-          PopOver(text: "Team Exists", popOverColor: CupertinoColors.activeGreen, brightness: Brightness.dark,)
+          PopOver(text: "Team Exists", popOverColor: Colors.green, brightness: Brightness.dark,)
       )
       );
     }
     else if(invalid) {
       columnChildren.insert(1, Align(alignment: Alignment.centerLeft, child:
-      PopOver(text: "Please Enter a Team Name", popOverColor: CupertinoColors.destructiveRed, brightness: Brightness.dark,)
+      PopOver(text: "Please Enter a Team Name", popOverColor: Colors.red, brightness: Brightness.dark,)
       )
       );
     }
-    return CupertinoPageScaffold(
-        child: Builder(builder: (context) => Container(padding: MediaQuery.of(context).padding, child: Column(children: columnChildren)
+    return WillPopScope(onWillPop: () => null, child: Scaffold(
+        body: Builder(builder: (context) => Container(padding: MediaQuery.of(context).padding, child: Column(children: columnChildren)
         )
         )
+    )
     );
   }
 

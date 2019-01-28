@@ -1,25 +1,22 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:parse_server_sdk/parse.dart';
 import 'dart:async';
 
 class CountDown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return CupertinoTabView(
-      builder: (context) => CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(middle: Text("HackDavis")),
-          child: Builder(builder: (context) {
+    return Scaffold(
+          body: Builder(builder: (context) {
             assert(debugCheckHasMediaQuery(context));
             EdgeInsets navEdge = MediaQuery.of(context).padding;
-            return Container(margin: navEdge + EdgeInsets.all(10.0), child: Column(children: <Widget>[
+            return Container(margin: navEdge + EdgeInsets.only(top: 10.0), child: Column(children: <Widget>[
               Time(),
               Expanded(child: Schedule())
             ],),
             );
           }
           )
-      )
-    );
+      );
   }
 }
 
@@ -42,13 +39,18 @@ class ScheduleState extends State<Schedule> {
   @override
   void initState() {
     ParseObject('Schedule').getAll().then((response) {
-      List<ScheduleItem> mItems = response.result.map<ScheduleItem>((element) => ScheduleItem(
-        element.get<String>("name"), element.get<String>("description"),
-          element.get<DateTime>("startTime"), element.get<DateTime>("endTime")
-      )).toList();
-      setState(() {
-        items = mItems;
-      });
+      if(response.result != null) {
+        List<ScheduleItem> mItems = response.result.map<ScheduleItem>((
+            element) =>
+            ScheduleItem(
+                element.get<String>("name"), element.get<String>("description"),
+                element.get<DateTime>("startTime"),
+                element.get<DateTime>("endTime")
+            )).toList();
+        setState(() {
+          items = mItems;
+        });
+      }
     }, onError: (error) => print(error));
     super.initState();
   }
@@ -57,16 +59,18 @@ class ScheduleState extends State<Schedule> {
 
     return ListView(
         padding: EdgeInsets.only(top: 0),
-        children: items.map((e) => Column(
+        children: items.map((e) => Padding(padding: EdgeInsets.all(15.0), child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children:[
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: [
-          Text(e.name),
-          Text("${e.startTime.hour.toString()}:${e.startTime.minute.toString()}")
+          Text(e.name, style: Theme.of(context).textTheme.headline,),
+          Text("${e.startTime.hour.toString()}:${e.startTime.minute.toString().padRight(2, "0")}",
+          style: Theme.of(context).textTheme.body1,
+          textScaleFactor: 1.25,)
         ]),
-        Text(e.description)
+        Text(e.description, style: Typography.whiteMountainView.subhead)
       ]
-    )).toList());
+    ))).toList());
   }
 
 }
@@ -103,12 +107,13 @@ class TimeTicker extends State<Time> {
     int minutes = delta.inHours % Duration.minutesPerHour;
     int seconds = delta.inSeconds % Duration.secondsPerMinute;
     String computed = "${delta.inHours.toString()}:$minutes:$seconds";
-    return Column(
+    return Padding(padding: EdgeInsets.all(15.0), child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text("Hackathon Ends: "),
           Text(computed, textScaleFactor: 3,)
-    ]);
+    ]
+    ));
   }
 
 }

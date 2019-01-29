@@ -12,7 +12,7 @@ class Team {
   Team(this.name, this.rank, this.count);
 }
 
-class Leaders extends State<LeaderBoard> with AutomaticKeepAliveClientMixin {
+class Leaders extends State<LeaderBoard> {
   List<Team> teams = [];
   @override
   void initState() {
@@ -56,7 +56,6 @@ class Leaders extends State<LeaderBoard> with AutomaticKeepAliveClientMixin {
   }
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     return Scaffold(
         body: Builder(builder: (context) => Container(padding: MediaQuery.of(context).padding,child: ListView(
           padding: EdgeInsets.all(15.0),
@@ -73,7 +72,4 @@ class Leaders extends State<LeaderBoard> with AutomaticKeepAliveClientMixin {
         )
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

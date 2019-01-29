@@ -138,19 +138,21 @@ class Badges extends State<BadgeWidget> with AutomaticKeepAliveClientMixin{
         tooltip: "Add a badge",
           child: Icon(Icons.add),
           onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddBadge())).then((response){
-            List<dynamic> codes = this.user.get<List<dynamic>>("codes");
-            codes.add(response);
-            this.user.set("codes", codes);
-            this.user.pin();
-            this.user.save();
-            this.badges.forEach((e) {
-              if(e.base.get<String>("codes") == response) {
-                e.isUnlocked = true;
-                  if(this.mounted) {
-                    setState((){});
+            if(response != null) {
+              List<dynamic> codes = this.user.get<List<dynamic>>("codes");
+              codes.add(response);
+              this.user.set("codes", codes);
+              this.user.pin();
+              this.user.save();
+              this.badges.forEach((e) {
+                if (e.base.get<String>("codes") == response) {
+                  e.isUnlocked = true;
+                  if (this.mounted) {
+                    setState(() {});
                   }
-              }
-            });
+                }
+              });
+            }
           })),
     );
   }

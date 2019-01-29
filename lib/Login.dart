@@ -58,6 +58,7 @@ class LoginForm extends State<Login> {
               var user = response.result;
               user.set<String>("teamName", userName.text);
               user.pin();
+              user.save();
               Navigator.of(context).pop(response);
             });
           }

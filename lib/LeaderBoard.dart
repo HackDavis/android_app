@@ -12,12 +12,11 @@ class Team {
   Team(this.name, this.rank, this.count);
 }
 
-class Leaders extends State<LeaderBoard> {
+class Leaders extends State<LeaderBoard> with AutomaticKeepAliveClientMixin {
   List<Team> teams = [];
   @override
   void initState() {
     ParseObject('_User').getAll().then((response) {
-      print(response.result);
       Map<String, Team> sTeams = {};
       for(var obj in response.result) {
         String name = obj.get<String>("teamName");
@@ -44,14 +43,20 @@ class Leaders extends State<LeaderBoard> {
           t.rank = curRank;
         }
       }
-      setState(() {
+      if(this.mounted) {
+        setState(() {
+          teams = sorted;
+        });
+      }
+      else {
         teams = sorted;
-      });
+      }
     }, onError: (error) => print(error));
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
         body: Builder(builder: (context) => Container(padding: MediaQuery.of(context).padding,child: ListView(
           padding: EdgeInsets.all(15.0),
@@ -68,4 +73,7 @@ class Leaders extends State<LeaderBoard> {
         )
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

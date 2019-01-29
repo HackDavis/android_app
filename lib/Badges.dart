@@ -8,15 +8,52 @@ class BadgeWidget extends StatefulWidget {
   State<StatefulWidget> createState() => Badges();
 }
 
-class Badges extends State<BadgeWidget> {
+class Badges extends State<BadgeWidget> with AutomaticKeepAliveClientMixin{
+  var badges = [];
+  @override
+  void initState() {
+    Future<dynamic> user = ParseUser.currentUser().then((response) => response.getCurrentUserFromServer());
+    Future<ParseResponse> badges = ParseObject("Badge").getAll();
+    Future.wait([user, badges]).then((list) {
+      ParseUser user = list[0].result;
+      ParseResponse badgeResponse = list[1];
+      var badges = badgeResponse.result;
+      List<dynamic> userCodes = user.get<List<dynamic>>("codes");
+      if(userCodes == null) {
+        user.set<List<dynamic>>("codes", []);
+        user.pin();
+      }
+      userCodes = user.get<List<dynamic>>("codes");
+      badges.sort((a, b) {
+        if(userCodes.contains(a.get<String>("codes"))) {
+          return -1;
+        }
+        else if(userCodes.contains(b.get<String>("codes"))) {
+          return 1;
+        }
+        else {
+          return 0;
+        }
+      });
+      if(this.mounted == true) {
+        setState(() => this.badges = badges);
+      }
+      else {
+        this.badges = badges;
+      }
+    }).catchError((error) {
+      print(error);
+    });
+
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
         body: Builder(builder: (context) =>
-            Container(padding: MediaQuery.of(context).padding, child:
-            GridView.count(crossAxisCount: 3, children: <Widget>[
-
-            ],)
+            Container(padding: MediaQuery.of(context).padding + EdgeInsets.all(10.0), child:
+            GridView.count(crossAxisCount: 3, children: badges.map((f) => Text(f.get<String>("objectId"))).toList())
     )
     ),
       floatingActionButton: FloatingActionButton(
@@ -25,6 +62,9 @@ class Badges extends State<BadgeWidget> {
           onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddBadge()))),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class AddBadge extends StatefulWidget {
@@ -39,7 +79,7 @@ class AddBadgeForm extends State<AddBadge> {
   Widget build(BuildContext context) {
     var columnChildren = <Widget>[];
     columnChildren += [
-      Text("Add a badge code", style: Theme.of(context).textTheme.headline),
+      Text("Add a badge", style: Theme.of(context).textTheme.headline),
       TextField(controller: controller, style: Theme.of(context).textTheme.body1, onChanged: (s) {
         if(invalid) {
           setState(() {
@@ -70,8 +110,10 @@ class AddBadgeForm extends State<AddBadge> {
       );
     }
     return Scaffold(
-      body: Builder(builder: (context) => Padding(padding: MediaQuery.of(context).padding,
-      child: Column(children: columnChildren,))
+      body: Builder(builder: (context) => Padding(padding: MediaQuery.of(context).padding + EdgeInsets.all(10.0),
+        child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: columnChildren,)
+      )
+    )
       )
     );
   }

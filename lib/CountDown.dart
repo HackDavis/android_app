@@ -34,11 +34,13 @@ class ScheduleItem {
   ScheduleItem(this.name, this.description, this.startTime, this.endTime);
 }
 
-class ScheduleState extends State<Schedule> {
+class ScheduleState extends State<Schedule> with AutomaticKeepAliveClientMixin {
   List<ScheduleItem> items = [];
   @override
   void initState() {
-    ParseObject('Schedule').getAll().then((response) {
+    var query = QueryBuilder<ParseObject>(ParseObject("Schedule"))
+    ..orderByAscending("startTime");
+    query.query().then((response) {
       if(response.result != null) {
         List<ScheduleItem> mItems = response.result.map<ScheduleItem>((
             element) =>
@@ -47,16 +49,21 @@ class ScheduleState extends State<Schedule> {
                 element.get<DateTime>("startTime"),
                 element.get<DateTime>("endTime")
             )).toList();
-        setState(() {
+        if(this.mounted) {
+          setState(() {
+            items = mItems;
+          });
+        }
+        else {
           items = mItems;
-        });
+        }
       }
     }, onError: (error) => print(error));
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-
+    super.build(context);
     return ListView(
         padding: EdgeInsets.only(top: 0),
         children: items.map((e) => Padding(padding: EdgeInsets.all(15.0), child: Column(
@@ -72,6 +79,9 @@ class ScheduleState extends State<Schedule> {
       ]
     ))).toList());
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
 }
 

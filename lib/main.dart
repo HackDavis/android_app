@@ -14,6 +14,7 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
+
   @override
   void initState() {
     Parse().initialize(
@@ -44,9 +45,10 @@ class MyAppState extends State<MyApp> {
   }
 }
 
-class MainWidgetState extends State<MainWidget> {
+class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMixin{
   dynamic currentUser = "waiting";
   int currentIndex = 0;
+  TabController _tabController;
   final _widgets = [
     CountDown(),
     BadgeWidget(),
@@ -69,6 +71,7 @@ class MainWidgetState extends State<MainWidget> {
     );
   }
     super.initState();
+    _tabController = new TabController(length: 3, vsync: this);
   }
   @override
   Widget build(BuildContext context) {
@@ -85,9 +88,10 @@ class MainWidgetState extends State<MainWidget> {
         currentIndex: currentIndex,
         onTap: (index) {
           setState(() => currentIndex = index);
+          _tabController.animateTo(index);
         },
       ),
-        body: _widgets.elementAt(currentIndex)
+        body: TabBarView(children: _widgets, controller: _tabController, physics: NeverScrollableScrollPhysics(),)
     );
   }
 }

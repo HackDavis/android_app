@@ -45,7 +45,7 @@ class LoginForm extends State<Login> {
             });
           }
           else {
-            try {
+            /*try {
               platform.invokeMethod("loginAnonymous",
                   <String, dynamic>{"teamName": userName.text}).then((result) {
                               Navigator.of(context).pop(result);
@@ -53,7 +53,13 @@ class LoginForm extends State<Login> {
             }
             on PlatformException catch (e) {
               print(e);
-            }
+            } */
+            ParseUser(null, null, null).loginAnonymous().then((response) {
+              var user = response.result;
+              user.set<String>("teamName", userName.text);
+              user.pin();
+              Navigator.of(context).pop(response);
+            });
           }
         },)
     ];
@@ -70,7 +76,8 @@ class LoginForm extends State<Login> {
       );
     }
     return WillPopScope(onWillPop: () => null, child: Scaffold(
-        body: Builder(builder: (context) => Container(padding: MediaQuery.of(context).padding, child: Column(children: columnChildren)
+        body: Builder(builder: (context) => Container(padding: MediaQuery.of(context).padding + EdgeInsets.all(10.0), child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,children: columnChildren)
+        )
         )
         )
     )

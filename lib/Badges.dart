@@ -149,7 +149,6 @@ class Badges extends State<BadgeWidget> with AutomaticKeepAliveClientMixin{
               this.badges.forEach((e) {
                 if (e.base.get<String>("codes") == response) {
                   e.isUnlocked = true;
-
                 }
               });
               this.badges.sort((a, b) {

@@ -102,8 +102,8 @@ class Badges extends State<BadgeWidget> with AutomaticKeepAliveClientMixin{
     });
     return Scaffold(
         body: Builder(builder: (context) =>
-            Container(padding: MediaQuery.of(context).padding + EdgeInsets.all(10.0), child:
-            GridView.count(crossAxisCount: 3, children: badges.map((f) {
+            Container(padding: MediaQuery.of(context).padding, child:
+            GridView.count(crossAxisCount: 3, padding: EdgeInsets.all(10.0), children: badges.map((f) {
               var children = <Widget>[];
               if(f.isUnlocked) {
                 ParseFile image = f.base.get<ParseFile>("image");
@@ -174,14 +174,16 @@ class AddBadgeForm extends State<AddBadge> {
     var columnChildren = <Widget>[];
     columnChildren += [
       Text("Add a badge", style: Theme.of(context).textTheme.headline),
-      TextField(controller: controller, style: Theme.of(context).textTheme.body1, onChanged: (s) {
+      Padding(padding: EdgeInsets.all(10.0) + EdgeInsets.only(bottom: 15.0), child: TextField(controller: controller, style: Theme.of(context).textTheme.body1, onChanged: (s) {
         if(invalid) {
           setState(() {
             invalid = false;
           });
         }
-      },),
-      FlatButton(child: Text("Submit", style: Theme.of(context).textTheme.button), onPressed: () {
+      },)),
+      RaisedButton(child: Text("Submit"),
+        textColor: Colors.black54,
+        onPressed: () {
         var query = QueryBuilder<ParseObject>(ParseObject("Badge"));
         query.whereEqualTo("codes", controller.text);
         query.query().then((response) {

@@ -29,6 +29,7 @@ class MyAppState extends State<MyApp> {
         scaffoldBackgroundColor: Color(0xFF091822),
         canvasColor: Color(0xFF091822),
         primaryColor: Color(0xFF7FFFD6),
+        buttonColor: Color(0xFF7FFFD6),
         textTheme: Typography.whiteMountainView.apply(
             bodyColor: Color(0xFF7FFFD6)
         )

@@ -87,17 +87,6 @@ class Badges extends State<BadgeWidget> with AutomaticKeepAliveClientMixin{
       var futures = mapped.map((e) => e.loadImage());
 
       Future.wait(futures).then((badges) {
-        badges.sort((a, b) {
-          if(a.isUnlocked && !b.isUnlocked) {
-            return -1;
-          }
-          else if(b.isUnlocked && !a.isUnlocked) {
-            return 1;
-          }
-          else {
-            return 0;
-          }
-        });
         if(this.mounted == true) {
           setState(() => this.badges = badges);
         }
@@ -160,11 +149,23 @@ class Badges extends State<BadgeWidget> with AutomaticKeepAliveClientMixin{
               this.badges.forEach((e) {
                 if (e.base.get<String>("codes") == response) {
                   e.isUnlocked = true;
-                  if (this.mounted) {
-                    setState(() {});
-                  }
+
                 }
               });
+              this.badges.sort((a, b) {
+                if(a.isUnlocked && !b.isUnlocked) {
+                  return -1;
+                }
+                else if(b.isUnlocked && !a.isUnlocked) {
+                  return 1;
+                }
+                else {
+                  return 0;
+                }
+              });
+              if (this.mounted) {
+                setState(() {});
+              }
             }
           })),
     );

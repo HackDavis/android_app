@@ -97,7 +97,7 @@ class LoginForm extends State<Login> {
               ParseUser(null, null, null).loginAnonymous().then((response) {
                 var user = response.result;
                 user.set<String>("teamName", teamName.text);
-                user.set<String>("realName", userName.text);
+                user.set<String>("name", userName.text);
                 user.pin();
                 user.save();
                 Navigator.of(context).pop(response);

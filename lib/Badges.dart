@@ -65,6 +65,18 @@ class Badges extends State<BadgeWidget> with AutomaticKeepAliveClientMixin{
         );
       }).toList();
 
+      mapped.sort((a, b) {
+        if(a.isUnlocked && !b.isUnlocked) {
+          return -1;
+        }
+        else if(b.isUnlocked && !a.isUnlocked) {
+          return 1;
+        }
+        else {
+          return 0;
+        }
+      });
+
       if(this.mounted == true) {
         setState(() => this.badges = mapped);
       }
@@ -75,6 +87,17 @@ class Badges extends State<BadgeWidget> with AutomaticKeepAliveClientMixin{
       var futures = mapped.map((e) => e.loadImage());
 
       Future.wait(futures).then((badges) {
+        badges.sort((a, b) {
+          if(a.isUnlocked && !b.isUnlocked) {
+            return -1;
+          }
+          else if(b.isUnlocked && !a.isUnlocked) {
+            return 1;
+          }
+          else {
+            return 0;
+          }
+        });
         if(this.mounted == true) {
           setState(() => this.badges = badges);
         }
@@ -89,17 +112,7 @@ class Badges extends State<BadgeWidget> with AutomaticKeepAliveClientMixin{
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    this.badges.sort((a, b) {
-      if(a.isUnlocked && !b.isUnlocked) {
-        return -1;
-      }
-      else if(b.isUnlocked && !a.isUnlocked) {
-        return 1;
-      }
-      else {
-        return 0;
-      }
-    });
+
     return Scaffold(
         body: Builder(builder: (context) =>
             Container(padding: MediaQuery.of(context).padding, child:

@@ -94,7 +94,7 @@ class Time extends StatefulWidget {
 class TimeTicker extends State<Time> {
   DateTime currentTime;
   Timer timer;
-  DateTime hackathon = DateTime(2019, 2, 10, 12);
+  DateTime hackathon = DateTime(2019, 2, 10, 12, 0, 0);
 
   @override
   void initState() {
@@ -114,7 +114,7 @@ class TimeTicker extends State<Time> {
   Widget build(BuildContext context) {
     currentTime = DateTime.now();
     Duration delta = hackathon.difference(currentTime);
-    int minutes = delta.inHours % Duration.minutesPerHour;
+    int minutes = delta.inMinutes % Duration.minutesPerHour;
     int seconds = delta.inSeconds % Duration.secondsPerMinute;
     String computed = "${delta.inHours.toString()}:$minutes:$seconds";
     return Padding(padding: EdgeInsets.all(15.0), child: Column(

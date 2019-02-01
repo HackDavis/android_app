@@ -26,13 +26,12 @@ class MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     var theme = ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: Color.fromARGB(255, 9, 24, 34),
-        canvasColor: Color.fromARGB(255, 9, 24, 34),
-        primaryColor: Color.fromARGB(255, 31, 200, 237),
-        buttonColor: Color.fromARGB(255, 31, 200, 237),
-        accentColor: Color.fromARGB(255, 31, 200, 237),
+        scaffoldBackgroundColor: Color(0xFF091822),
+        canvasColor: Color(0xFF091822),
+        primaryColor: Color(0xFF7FFFD6),
+        buttonColor: Color(0xFF7FFFD6),
         textTheme: Typography.whiteMountainView.apply(
-            bodyColor: Color.fromARGB(255, 31, 200, 237)
+            bodyColor: Color(0xFF7FFFD6)
         )
     );
     return MaterialApp(

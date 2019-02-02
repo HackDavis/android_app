@@ -52,6 +52,100 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
   TabController _tabController;
   List<Team> teams = [];
   List<ScheduleItem> items = [];
+  List<Badge> badges = [];
+
+  void addBadge(response){
+    if(response != null) {
+      ParseUser.currentUser().then((user) {
+        List<dynamic> codes = user.get<List<dynamic>>("codes");
+        codes.add(response);
+        user.set("codes", codes);
+        user.pin();
+        user.save();
+        this.badges.forEach((e) {
+          if (e.base.get<String>("codes") == response) {
+            e.isUnlocked = true;
+          }
+        });
+        this.badges.sort((a, b) {
+          if(a.isUnlocked && !b.isUnlocked) {
+            return -1;
+          }
+          else if(b.isUnlocked && !a.isUnlocked) {
+            return 1;
+          }
+          else {
+            return 0;
+          }
+        });
+        if (this.mounted) {
+          setState(() {});
+        }
+      });
+    }
+  }
+
+  void getBadges() {
+    Future<dynamic> user = ParseUser.currentUser().then((response) {
+      if(response != null) {
+        return response.getCurrentUserFromServer();
+      }
+      else {
+        return Future.value(null);
+      }
+    }
+    );
+    Future<ParseResponse> badges = ParseObject("Badge").getAll();
+    Future.wait([user, badges]).then((list) {
+      ParseUser user = list[0]?.result;
+      ParseResponse badgeResponse = list[1];
+      var badges = badgeResponse.result;
+      List<dynamic> userCodes = user?.get<List<dynamic>>("codes");
+
+      if(userCodes == null) {
+        user?.set<List<dynamic>>("codes", []);
+        user?.pin();
+        user?.save();
+      }
+      userCodes = user?.get<List<dynamic>>("codes");
+
+      List<Badge> mapped = badges.map<Badge>((badge) {
+        return Badge(
+            badge.get<String>("title"), (userCodes?.contains(badge.get<String>("codes") ?? false)), badge
+        );
+      }).toList();
+
+      mapped.sort((a, b) {
+        if(a.isUnlocked && !b.isUnlocked) {
+          return -1;
+        }
+        else if(b.isUnlocked && !a.isUnlocked) {
+          return 1;
+        }
+        else {
+          return 0;
+        }
+      });
+
+      if(this.mounted == true) {
+        setState(() => this.badges = mapped);
+      }
+      else {
+        this.badges = mapped;
+      }
+
+      var futures = mapped.map((e) => e.loadImage());
+
+      Future.wait(futures).then((badges) {
+        if(this.mounted == true) {
+          setState(() => this.badges = badges);
+        }
+        else {
+          this.badges = badges;
+        }
+      });
+    });
+  }
 
   void getSchedule() {
     var query = QueryBuilder<ParseObject>(ParseObject("Schedule"))
@@ -127,6 +221,7 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
       else {
         setState(() {
           currentUser = response;
+          getBadges();
         });
       }
     }
@@ -134,6 +229,7 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
   }
     getTeams();
     getSchedule();
+    getBadges();
     super.initState();
     _tabController = new TabController(length: 3, vsync: this);
   }
@@ -160,7 +256,7 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
       ),
         body: TabBarView(children: [
           CountDown(items),
-          BadgeWidget(),
+          BadgeWidget(badges, addBadge),
           LeaderBoard(teams)
         ], controller: _tabController, physics: NeverScrollableScrollPhysics(),)
     );

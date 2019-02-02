@@ -215,13 +215,15 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
     if(currentUser == "waiting") {
     ParseUser.currentUser().then((response) {
       if (response == null) {
-        Navigator.of(context).pushNamed("/login").then((result) =>
-        setState(() => currentUser = result));
+        Navigator.of(context).pushNamed("/login").then((result) {
+          getBadges();
+          setState(() => currentUser = result);
+        });
       }
       else {
+        getBadges();
         setState(() {
           currentUser = response;
-          getBadges();
         });
       }
     }

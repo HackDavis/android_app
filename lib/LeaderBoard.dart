@@ -12,10 +12,10 @@ class LeaderBoard extends StatelessWidget {
           children: teams.map((e) => Padding(padding: EdgeInsets.only(top: 10.0, bottom: 10.0), child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text("#${e.rank} - ${e.name}", style:
+              Flexible(child: Text("#${e.rank} - ${e.name}", style:
               (e.rank <= 3 ? Theme.of(context).textTheme.body1 : Typography.whiteMountainView.body1),
-                textScaleFactor: 1.2,),
-              Text("${e.count} Badges", style: Theme.of(context).textTheme.body1, textScaleFactor: 1.2,)
+                textScaleFactor: 1.2,)),
+              Container(margin: EdgeInsets.only(left: 50.0),child: Text("${e.count} Badges", style: Theme.of(context).textTheme.body1, textScaleFactor: 1.2,))
             ],
           ))).toList(),
         )

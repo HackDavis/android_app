@@ -3,6 +3,10 @@ import 'package:parse_server_sdk/parse.dart';
 import 'dart:async';
 
 class CountDown extends StatelessWidget {
+  final List<ScheduleItem> items;
+
+  CountDown(this.items);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,7 +15,7 @@ class CountDown extends StatelessWidget {
             EdgeInsets navEdge = MediaQuery.of(context).padding;
             return Container(margin: navEdge + EdgeInsets.only(top: 10.0), child: Column(children: <Widget>[
               Time(),
-              Expanded(child: Schedule())
+              Expanded(child: Schedule(items))
             ],),
             );
           }
@@ -20,10 +24,28 @@ class CountDown extends StatelessWidget {
   }
 }
 
-class Schedule extends StatefulWidget {
-  @override
-  ScheduleState createState() => ScheduleState();
+class Schedule extends StatelessWidget {
+  final List<ScheduleItem> items;
 
+  Schedule(this.items);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+        padding: EdgeInsets.only(top: 0),
+        children: items.map((e) => Padding(padding: EdgeInsets.all(15.0), child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children:[
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: [
+                Text(e.name, style: Theme.of(context).textTheme.headline,),
+                Text("${e.startTime.hour.toString()}:${e.startTime.minute.toString().padRight(2, "0")}",
+                  style: Theme.of(context).textTheme.body1,
+                  textScaleFactor: 1.25,)
+              ]),
+              Text(e.description, style: Typography.whiteMountainView.subhead)
+            ]
+        ))).toList());
+  }
 }
 
 class ScheduleItem {
@@ -32,57 +54,6 @@ class ScheduleItem {
   DateTime startTime;
   DateTime endTime;
   ScheduleItem(this.name, this.description, this.startTime, this.endTime);
-}
-
-class ScheduleState extends State<Schedule> with AutomaticKeepAliveClientMixin {
-  List<ScheduleItem> items = [];
-  @override
-  void initState() {
-    var query = QueryBuilder<ParseObject>(ParseObject("Schedule"))
-    ..orderByAscending("startTime");
-    query.query().then((response) {
-      if(response.result != null) {
-        List<ScheduleItem> mItems = response.result.map<ScheduleItem>((
-            element) =>
-            ScheduleItem(
-                element.get<String>("name"), element.get<String>("description"),
-                element.get<DateTime>("startTime"),
-                element.get<DateTime>("endTime")
-            )).toList();
-        if(this.mounted) {
-          setState(() {
-            items = mItems;
-          });
-        }
-        else {
-          items = mItems;
-        }
-      }
-    }, onError: (error) => print(error));
-    super.initState();
-  }
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return ListView(
-        padding: EdgeInsets.only(top: 0),
-        children: items.map((e) => Padding(padding: EdgeInsets.all(15.0), child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children:[
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: [
-          Text(e.name, style: Theme.of(context).textTheme.headline,),
-          Text("${e.startTime.hour.toString()}:${e.startTime.minute.toString().padRight(2, "0")}",
-          style: Theme.of(context).textTheme.body1,
-          textScaleFactor: 1.25,)
-        ]),
-        Text(e.description, style: Typography.whiteMountainView.subhead)
-      ]
-    ))).toList());
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-
 }
 
 class Time extends StatefulWidget {

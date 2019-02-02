@@ -50,11 +50,72 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
   dynamic currentUser = "waiting";
   int currentIndex = 0;
   TabController _tabController;
-  final _widgets = [
-    CountDown(),
-    BadgeWidget(),
-    LeaderBoard()
-  ];
+  List<Team> teams = [];
+  List<ScheduleItem> items = [];
+
+  void getSchedule() {
+    var query = QueryBuilder<ParseObject>(ParseObject("Schedule"))
+      ..orderByAscending("startTime");
+    query.query().then((response) {
+      if(response.result != null) {
+        List<ScheduleItem> mItems = response.result.map<ScheduleItem>((
+            element) =>
+            ScheduleItem(
+                element.get<String>("name"), element.get<String>("description"),
+                element.get<DateTime>("startTime"),
+                element.get<DateTime>("endTime")
+            )).toList();
+        if(this.mounted) {
+          setState(() {
+            items = mItems;
+          });
+        }
+        else {
+          items = mItems;
+        }
+      }
+    }, onError: (error) => print(error));
+  }
+
+  void getTeams() {
+    ParseObject('_User').getAll().then((response) {
+      Map<String, Team> sTeams = {};
+      for(var obj in response.result) {
+        String name = obj.get<String>("teamName");
+        var codes = obj.get<List<dynamic>>("codes");
+        if(codes == null) {
+          codes = [];
+        }
+        int count = codes.length;
+        if(sTeams[name] == null) {
+          sTeams[name] = Team(name, 1, 0);
+        }
+        sTeams[name].count += count;
+      }
+      List<Team> sorted = sTeams.values.toList();
+      sorted.sort((a, b) => b.count - a.count);
+      int curCount = 1000000;
+      int curRank = 0;
+      for(Team t in sorted) {
+        if(t.count < curCount) {
+          curCount = t.count;
+          t.rank = ++curRank;
+        }
+        else {
+          t.rank = curRank;
+        }
+      }
+      if(this.mounted) {
+        setState(() {
+          teams = sorted;
+        });
+      }
+      else {
+        teams = sorted;
+      }
+    }, onError: (error) => print(error));
+  }
+
   @override
   void initState() {
     if(currentUser == "waiting") {
@@ -71,6 +132,8 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
     }
     );
   }
+    getTeams();
+    getSchedule();
     super.initState();
     _tabController = new TabController(length: 3, vsync: this);
   }
@@ -88,11 +151,18 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
         ],
         currentIndex: currentIndex,
         onTap: (index) {
+          if(index == 2) {
+            getTeams();
+          }
           setState(() => currentIndex = index);
           _tabController.animateTo(index);
         },
       ),
-        body: TabBarView(children: _widgets, controller: _tabController, physics: NeverScrollableScrollPhysics(),)
+        body: TabBarView(children: [
+          CountDown(items),
+          BadgeWidget(),
+          LeaderBoard(teams)
+        ], controller: _tabController, physics: NeverScrollableScrollPhysics(),)
     );
   }
 }

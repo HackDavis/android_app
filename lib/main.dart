@@ -32,7 +32,8 @@ class MyAppState extends State<MyApp> {
         buttonColor: Color(0xFF7FFFD6),
         textTheme: Typography.whiteMountainView.apply(
             bodyColor: Color(0xFF7FFFD6)
-        )
+        ),
+      dividerColor: Colors.white30
     );
     return MaterialApp(
       title: "HackDavis",
@@ -111,7 +112,7 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
 
       List<Badge> mapped = badges.map<Badge>((badge) {
         return Badge(
-            badge.get<String>("title"), (userCodes?.contains(badge.get<String>("codes") ?? false)), badge
+            badge.get<String>("title"), (userCodes?.contains(badge.get<String>("codes")) ?? false), badge
         );
       }).toList();
 
@@ -241,7 +242,9 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
       return Center(child: RefreshProgressIndicator());
     }
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: Container(decoration: BoxDecoration(border: Border(
+        top: BorderSide(color: Theme.of(context).dividerColor)
+      )), child: BottomNavigationBar(
         items: <BottomNavigationBarItem> [
           BottomNavigationBarItem(title: Text("Schedule"), icon: Icon(Icons.alarm)),
           BottomNavigationBarItem(title: Text("Badges"), icon: Icon(Icons.bookmark)),
@@ -255,7 +258,7 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
           setState(() => currentIndex = index);
           _tabController.animateTo(index);
         },
-      ),
+      )),
         body: TabBarView(children: [
           CountDown(items),
           BadgeWidget(badges, addBadge),

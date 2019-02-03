@@ -255,6 +255,9 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
           if(index == 2) {
             getTeams();
           }
+	  else if(index == 0) {
+            getSchedule();	    
+          }
           setState(() => currentIndex = index);
           _tabController.animateTo(index);
         },

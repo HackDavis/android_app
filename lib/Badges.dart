@@ -19,7 +19,7 @@ class BadgeWidget extends StatelessWidget {
             if(f.isUnlocked) {
               ParseFile image = f.base.get<ParseFile>("image");
               if(image != null && image.file != null) {
-                children.add(Padding(padding: EdgeInsets.all(10.0), child: Image.file(image.file)));
+                children.add(Flexible(child: Padding(padding: EdgeInsets.only(bottom: 2.5), child: Image.file(image.file))));
               }
               children.add(Text(f.title, style: Theme
                   .of(context)
@@ -38,8 +38,8 @@ class BadgeWidget extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10.0),
                         color: f.isUnlocked ? Color.fromRGBO(
                             255, 255, 255, 0.1) : Colors.transparent),
-                    child: Column(mainAxisAlignment: MainAxisAlignment.center,
-                      children: children,)
+                    child: Padding(padding: EdgeInsets.all(5.0), child: Column(mainAxisAlignment: MainAxisAlignment.center,
+                      children: children,))
                 )
             );
           }).toList())
@@ -109,8 +109,7 @@ class AddBadgeForm extends State<AddBadge> {
         var query = QueryBuilder<ParseObject>(ParseObject("Badge"));
         query.whereEqualTo("codes", controller.text);
         query.query().then((response) {
-          print(response.result);
-          if(response.result != null) {
+          if(response.result != null && response.result[0].get<bool>("live") == true) {
             Navigator.of(context).pop(controller.text);
           }
           else {
@@ -124,7 +123,7 @@ class AddBadgeForm extends State<AddBadge> {
     if(invalid) {
       columnChildren.insert(2, Align(
         alignment: Alignment.centerLeft,
-          child: PopOver(text: "Badge Number is Wrong", popOverColor: Colors.red, brightness: Brightness.dark,))
+          child: PopOver(text: "Badge Number is Unavailable", popOverColor: Colors.red, brightness: Brightness.dark,))
       );
     }
     return Scaffold(

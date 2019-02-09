@@ -33,18 +33,23 @@ class Schedule extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
         padding: EdgeInsets.only(top: 0),
-        children: items.map((e) => Padding(padding: EdgeInsets.all(15.0), child: Column(
+        children: items.map((e) {
+          var columnChildren = <Widget>[
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: [
+              Text(e.name, style: Theme.of(context).textTheme.headline,),
+              Text("${e.startTime.hour.toString()}:${e.startTime.minute.toString().padRight(2, "0")}",
+                style: Theme.of(context).textTheme.body1,
+                textScaleFactor: 1.25,)
+            ])
+          ];
+          if(e.description != null && e.description != "") {
+            columnChildren.add(Text(e.description, style: Typography.whiteMountainView.subhead));
+          }
+          return Padding(padding: EdgeInsets.all(15.0), child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children:[
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: [
-                Text(e.name, style: Theme.of(context).textTheme.headline,),
-                Text("${e.startTime.hour.toString()}:${e.startTime.minute.toString().padRight(2, "0")}",
-                  style: Theme.of(context).textTheme.body1,
-                  textScaleFactor: 1.25,)
-              ]),
-              Text(e.description, style: Typography.whiteMountainView.subhead)
-            ]
-        ))).toList());
+            children: columnChildren
+        ));
+        }).toList());
   }
 }
 

@@ -98,6 +98,7 @@ class LoginForm extends State<Login> {
                 var user = response.result;
                 user.set<String>("teamName", teamName.text);
                 user.set<String>("name", userName.text);
+                user.set<List<dynamic>>("codes", ["1234"]);
                 user.pin();
                 user.save();
                 Navigator.of(context).pop(response);

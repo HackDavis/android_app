@@ -36,7 +36,7 @@ class Schedule extends StatelessWidget {
         children: items.map((e) {
           var columnChildren = <Widget>[
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: [
-              Text(e.name, style: Theme.of(context).textTheme.headline,),
+              Flexible(child: Text(e.name, style: Theme.of(context).textTheme.headline,)),
               Text("${e.startTime.hour.toString()}:${e.startTime.minute.toString().padRight(2, "0")}",
                 style: Theme.of(context).textTheme.body1,
                 textScaleFactor: 1.25,)

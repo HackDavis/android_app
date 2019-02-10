@@ -177,7 +177,6 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
       Map<String, Team> sTeams = {};
       if(response.result != null) {
         for (var obj in response.result) {
-          print(obj.get<String>("name"));
           String name = obj.get<String>("teamName");
           var codes = obj.get<List<dynamic>>("codes");
           var codesSet = Set.from(codes);
@@ -259,7 +258,10 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
           if(index == 2) {
             getTeams();
           }
-	  else if(index == 0) {
+          else if(index == 1) {
+            getBadges();
+          }
+	        else if(index == 0) {
             getSchedule();	    
           }
           setState(() => currentIndex = index);

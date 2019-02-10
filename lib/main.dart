@@ -173,16 +173,18 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
   }
 
   void getTeams() {
-    ParseObject('_User').getAll().then((response) {
+    var query = QueryBuilder<ParseObject>(ParseObject("_User"));
+    query.setLimit(400);
+    query.query().then((response) {
       Map<String, Team> sTeams = {};
       if(response.result != null) {
         for (var obj in response.result) {
           String name = obj.get<String>("teamName");
           var codes = obj.get<List<dynamic>>("codes");
-          var codesSet = Set.from(codes);
           if (codes == null) {
             codes = [];
           }
+          var codesSet = Set.from(codes);
           int count = codesSet.length;
           if (sTeams[name] == null) {
             sTeams[name] = Team(name, 1, 0);

@@ -175,38 +175,42 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
   void getTeams() {
     ParseObject('_User').getAll().then((response) {
       Map<String, Team> sTeams = {};
-      for(var obj in response.result) {
-        String name = obj.get<String>("teamName");
-        var codes = obj.get<List<dynamic>>("codes");
-        if(codes == null) {
-          codes = [];
+      if(response.result != null) {
+        for (var obj in response.result) {
+          print(obj.get<String>("name"));
+          String name = obj.get<String>("teamName");
+          var codes = obj.get<List<dynamic>>("codes");
+          var codesSet = Set.from(codes);
+          if (codes == null) {
+            codes = [];
+          }
+          int count = codesSet.length;
+          if (sTeams[name] == null) {
+            sTeams[name] = Team(name, 1, 0);
+          }
+          sTeams[name].count += count;
         }
-        int count = codes.length;
-        if(sTeams[name] == null) {
-          sTeams[name] = Team(name, 1, 0);
+        List<Team> sorted = sTeams.values.toList();
+        sorted.sort((a, b) => b.count - a.count);
+        int curCount = 1000000;
+        int curRank = 0;
+        for (Team t in sorted) {
+          if (t.count < curCount) {
+            curCount = t.count;
+            t.rank = ++curRank;
+          }
+          else {
+            t.rank = curRank;
+          }
         }
-        sTeams[name].count += count;
-      }
-      List<Team> sorted = sTeams.values.toList();
-      sorted.sort((a, b) => b.count - a.count);
-      int curCount = 1000000;
-      int curRank = 0;
-      for(Team t in sorted) {
-        if(t.count < curCount) {
-          curCount = t.count;
-          t.rank = ++curRank;
+        if (this.mounted) {
+          setState(() {
+            teams = sorted;
+          });
         }
         else {
-          t.rank = curRank;
-        }
-      }
-      if(this.mounted) {
-        setState(() {
           teams = sorted;
-        });
-      }
-      else {
-        teams = sorted;
+        }
       }
     }, onError: (error) => print(error));
   }

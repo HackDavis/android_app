@@ -14,14 +14,13 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-
   @override
   void initState() {
     Parse().initialize(
-        "hackdavis2019",
-        "https://hackdavisapp.herokuapp.com/parse");
+        "hackdavis2019", "https://hackdavisapp.herokuapp.com/parse");
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     var theme = ThemeData(
@@ -30,24 +29,21 @@ class MyAppState extends State<MyApp> {
         canvasColor: Color(0xFF091822),
         primaryColor: Color(0xFF7FFFD6),
         buttonColor: Color(0xFF7FFFD6),
-        textTheme: Typography.whiteMountainView.apply(
-            bodyColor: Color(0xFF7FFFD6)
-        ),
-      dividerColor: Colors.white30
-    );
+        textTheme:
+            Typography.whiteMountainView.apply(bodyColor: Color(0xFF7FFFD6)),
+        dividerColor: Colors.white30);
     return MaterialApp(
       title: "HackDavis",
       home: MainWidget(),
       initialRoute: "/",
-      routes: {
-        '/login': (context) => Login()
-      },
+      routes: {'/login': (context) => Login()},
       theme: theme,
     );
   }
 }
 
-class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMixin{
+class MainWidgetState extends State<MainWidget>
+    with SingleTickerProviderStateMixin {
   dynamic currentUser = "waiting";
   int currentIndex = 0;
   TabController _tabController;
@@ -55,8 +51,8 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
   List<ScheduleItem> items = [];
   List<Badge> badges = [];
 
-  void addBadge(response){
-    if(response != null) {
+  void addBadge(response) {
+    if (response != null) {
       ParseUser.currentUser().then((user) {
         List<dynamic> codes = user.get<List<dynamic>>("codes");
         codes.add(response);
@@ -69,13 +65,11 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
           }
         });
         this.badges.sort((a, b) {
-          if(a.isUnlocked && !b.isUnlocked) {
+          if (a.isUnlocked && !b.isUnlocked) {
             return -1;
-          }
-          else if(b.isUnlocked && !a.isUnlocked) {
+          } else if (b.isUnlocked && !a.isUnlocked) {
             return 1;
-          }
-          else {
+          } else {
             return 0;
           }
         });
@@ -88,14 +82,12 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
 
   void getBadges() {
     Future<dynamic> user = ParseUser.currentUser().then((response) {
-      if(response != null) {
+      if (response != null) {
         return response.getCurrentUserFromServer();
-      }
-      else {
+      } else {
         return Future.value(null);
       }
-    }
-    );
+    });
     Future<ParseResponse> badges = ParseObject("Badge").getAll();
     Future.wait([user, badges]).then((list) {
       ParseUser user = list[0]?.result;
@@ -103,7 +95,7 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
       var badges = badgeResponse.result;
       List<dynamic> userCodes = user?.get<List<dynamic>>("codes");
 
-      if(userCodes == null) {
+      if (userCodes == null) {
         user?.set<List<dynamic>>("codes", []);
         user?.pin();
         user?.save();
@@ -111,37 +103,32 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
       userCodes = user?.get<List<dynamic>>("codes");
 
       List<Badge> mapped = badges.map<Badge>((badge) {
-        return Badge(
-            badge.get<String>("title"), (userCodes?.contains(badge.get<String>("codes")) ?? false), badge
-        );
+        return Badge(badge.get<String>("title"),
+            (userCodes?.contains(badge.get<String>("codes")) ?? false), badge);
       }).toList();
 
       mapped.sort((a, b) {
-        if(a.isUnlocked && !b.isUnlocked) {
+        if (a.isUnlocked && !b.isUnlocked) {
           return -1;
-        }
-        else if(b.isUnlocked && !a.isUnlocked) {
+        } else if (b.isUnlocked && !a.isUnlocked) {
           return 1;
-        }
-        else {
+        } else {
           return 0;
         }
       });
 
-      if(this.mounted == true) {
+      if (this.mounted == true) {
         setState(() => this.badges = mapped);
-      }
-      else {
+      } else {
         this.badges = mapped;
       }
 
       var futures = mapped.map((e) => e.loadImage());
 
       Future.wait(futures).then((badges) {
-        if(this.mounted == true) {
+        if (this.mounted == true) {
           setState(() => this.badges = badges);
-        }
-        else {
+        } else {
           this.badges = badges;
         }
       });
@@ -152,20 +139,19 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
     var query = QueryBuilder<ParseObject>(ParseObject("Schedule"))
       ..orderByAscending("startTime");
     query.query().then((response) {
-      if(response.result != null) {
-        List<ScheduleItem> mItems = response.result.map<ScheduleItem>((
-            element) =>
-            ScheduleItem(
-                element.get<String>("name"), element.get<String>("description"),
+      if (response.result != null) {
+        List<ScheduleItem> mItems = response.result
+            .map<ScheduleItem>((element) => ScheduleItem(
+                element.get<String>("name"),
+                element.get<String>("description"),
                 element.get<DateTime>("startTime"),
-                element.get<DateTime>("endTime")
-            )).toList();
-        if(this.mounted) {
+                element.get<DateTime>("endTime")))
+            .toList();
+        if (this.mounted) {
           setState(() {
             items = mItems;
           });
-        }
-        else {
+        } else {
           items = mItems;
         }
       }
@@ -177,7 +163,7 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
     query.setLimit(400);
     query.query().then((response) {
       Map<String, Team> sTeams = {};
-      if(response.result != null) {
+      if (response.result != null) {
         for (var obj in response.result) {
           String name = obj.get<String>("teamName");
           var codes = obj.get<List<dynamic>>("codes");
@@ -199,8 +185,7 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
           if (t.count < curCount) {
             curCount = t.count;
             t.rank = ++curRank;
-          }
-          else {
+          } else {
             t.rank = curRank;
           }
         }
@@ -208,8 +193,7 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
           setState(() {
             teams = sorted;
           });
-        }
-        else {
+        } else {
           teams = sorted;
         }
       }
@@ -218,64 +202,69 @@ class MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMi
 
   @override
   void initState() {
-    if(currentUser == "waiting") {
-    ParseUser.currentUser().then((response) {
-      if (response == null) {
-        Navigator.of(context).pushNamed("/login").then((result) {
+    if (currentUser == "waiting") {
+      ParseUser.currentUser().then((response) {
+        if (response == null) {
+          Navigator.of(context).pushNamed("/login").then((result) {
+            getBadges();
+            setState(() => currentUser = result);
+          });
+        } else {
           getBadges();
-          setState(() => currentUser = result);
-        });
-      }
-      else {
-        getBadges();
-        setState(() {
-          currentUser = response;
-        });
-      }
+          setState(() {
+            currentUser = response;
+          });
+        }
+      });
     }
-    );
-  }
     getTeams();
     getSchedule();
     getBadges();
     super.initState();
     _tabController = new TabController(length: 3, vsync: this);
   }
+
   @override
   Widget build(BuildContext context) {
-    if(currentUser == "waiting") {
+    if (currentUser == "waiting") {
       return Center(child: RefreshProgressIndicator());
     }
     return Scaffold(
-      bottomNavigationBar: Container(decoration: BoxDecoration(border: Border(
-        top: BorderSide(color: Theme.of(context).dividerColor)
-      )), child: BottomNavigationBar(
-        items: <BottomNavigationBarItem> [
-          BottomNavigationBarItem(title: Text("Schedule"), icon: Icon(Icons.alarm)),
-          BottomNavigationBarItem(title: Text("Badges"), icon: Icon(Icons.bookmark)),
-          BottomNavigationBarItem(title: Text("Leaderboard"), icon: Icon(Icons.flag)),
-        ],
-        currentIndex: currentIndex,
-        onTap: (index) {
-          if(index == 2) {
-            getTeams();
-          }
-          else if(index == 1) {
-            getBadges();
-          }
-	        else if(index == 0) {
-            getSchedule();	    
-          }
-          setState(() => currentIndex = index);
-          _tabController.animateTo(index);
-        },
-      )),
-        body: TabBarView(children: [
-          CountDown(items),
-          BadgeWidget(badges, addBadge),
-          LeaderBoard(teams)
-        ], controller: _tabController, physics: NeverScrollableScrollPhysics(),)
-    );
+        bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+                border: Border(
+                    top: BorderSide(color: Theme.of(context).dividerColor))),
+            child: BottomNavigationBar(
+              items: <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                    title: Text("Schedule"), icon: Icon(Icons.alarm)),
+                BottomNavigationBarItem(
+                    title: Text("Badges"), icon: Icon(Icons.bookmark)),
+                BottomNavigationBarItem(
+                    title: Text("Leaderboard"), icon: Icon(Icons.flag)),
+              ],
+              currentIndex: currentIndex,
+              onTap: (index) {
+                if (index == 2) {
+                  getTeams();
+                } else if (index == 1) {
+                  getBadges();
+                } else if (index == 0) {
+                  getSchedule();
+                }
+                setState(() => currentIndex = index);
+                _tabController.animateTo(index);
+              },
+            )),
+        body: TabBarView(
+          children: [
+            CountDown(items),
+            BadgeWidget(badges, addBadge),
+            LeaderBoard(teams)
+          ],
+          controller: _tabController,
+          physics: NeverScrollableScrollPhysics(),
+        ));
   }
 }
 

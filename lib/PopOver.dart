@@ -16,7 +16,8 @@ class Triangle extends CustomPainter {
     Offset triangleTop = centerTop - new Offset(0, 10.0);
 
     Path triangle = new Path()
-      ..addPolygon([triangleLeft, triangleTop, triangleRight, triangleLeft], true);
+      ..addPolygon(
+          [triangleLeft, triangleTop, triangleRight, triangleLeft], true);
     canvas.drawPath(triangle, paint);
   }
 
@@ -32,24 +33,26 @@ class PopOver extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color pColor = popOverColor;
-    if(pColor == null) {
+    if (pColor == null) {
       pColor = Color.fromRGBO(0, 0, 0, 0.3);
     }
     Color textColor = Color.fromRGBO(0, 0, 0, 1);
-    if(this.brightness == Brightness.dark) {
+    if (this.brightness == Brightness.dark) {
       textColor = Color.fromRGBO(255, 255, 255, 1);
     }
-    return Padding(padding: EdgeInsets.only(top: 10.0), child: CustomPaint(
-        foregroundPainter: Triangle(pColor),
-        child:
-
-        DecoratedBox(decoration: BoxDecoration(color: this.popOverColor,
-            borderRadius: BorderRadius.circular(5.0)),
-            child: Padding(padding: EdgeInsets.all(10.0) , child: Text(this.text,style: TextStyle(color: textColor),)
-            )
-        )
-    )
-    );
+    return Padding(
+        padding: EdgeInsets.only(top: 10.0),
+        child: CustomPaint(
+            foregroundPainter: Triangle(pColor),
+            child: DecoratedBox(
+                decoration: BoxDecoration(
+                    color: this.popOverColor,
+                    borderRadius: BorderRadius.circular(5.0)),
+                child: Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: Text(
+                      this.text,
+                      style: TextStyle(color: textColor),
+                    )))));
   }
-
 }
